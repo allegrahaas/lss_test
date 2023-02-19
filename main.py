@@ -13,7 +13,7 @@ class PossibleLSSFileNames:
     def print(self):
         print(self.original_file_name)
         for index, name in enumerate(self.lss_names):
-            print(name + " " + self.numbers[index])
+            print(f"{name} {self.numbers[index]}")
 
         print()
 
