@@ -1,6 +1,6 @@
-import os, re
+import os
+import re
 from os import listdir
-from os.path import isfile, join
 
 
 class PossibleLSSFileNames:
@@ -33,6 +33,7 @@ class PossibleLSSFileNames:
 
         return None
 
+
 class LSSGroup:
     def __init__(self, pattern, number1=None, number2=None):
         self.pattern = pattern
@@ -57,7 +58,6 @@ class LSSGroup:
             print(f"{self.count} {self.pattern} {self.make_ranges()}")
 
     def make_ranges(self):
-        ranges = []
         range_str = ""
         self.numbers.sort()
 
@@ -71,7 +71,7 @@ class LSSGroup:
                 range_end = number
 
             # range continues
-            elif int(number) == int(range_end) + 1:
+            elif number == range_end + 1:
                 range_end += 1
 
             else:
@@ -83,7 +83,7 @@ class LSSGroup:
                 range_start = number
                 range_end = number
 
-        #append last range
+        # append last range
         if range_start == range_end:
             range_str += f"{range_start} "
         else:
@@ -110,8 +110,8 @@ def generate_variations(file_name) -> PossibleLSSFileNames:
             pattern = file_name[:match.start()] + "%d" + file_name[match.end():]
             lss_names.append(pattern)
         else:
-            #zero pad
-            pattern = file_name[:match.start()] + "%0" + str(length) + "d" + file_name[match.end():]
+            # zero pad
+            pattern = f"{file_name[:match.start()]}%0{length}d{file_name[match.end():]}"
             lss_names.append(pattern)
 
     return PossibleLSSFileNames(original_file_name=file_name, lss_names=lss_names, numbers=numbers)
