@@ -2,9 +2,9 @@ import os
 import re
 from os import listdir
 
-
+# Object to hold possible formatted file names. Index of pattern in lss_names corresponds to matching number in numbers
 class PossibleLSSFileNames:
-    def __init__(self, original_file_name, lss_names, numbers):
+    def __init__(self, original_file_name: str, lss_names: list, numbers: list):
         self.original_file_name = original_file_name
         self.lss_names = lss_names
         self.numbers = numbers
@@ -17,13 +17,17 @@ class PossibleLSSFileNames:
 
         print()
 
-    def check_single_match(self, target):
+    # Iterates through possible formatted names looking for a match to target
+    # Returns number that corresponds with pattern entry
+    def check_single_match(self, target: str):
         for index, name in enumerate(self.lss_names):
             if name == target:
                 return self.numbers[index]
 
         return None
 
+    # Iterates through this object's formatted file names looking for a match in other object's possible names
+    # Returns a new LSSGroup containing 2 entries
     def check_list(self, lss_file):
         for index1, pattern in enumerate(self.lss_names):
             if pattern in lss_file.lss_names:
@@ -34,6 +38,7 @@ class PossibleLSSFileNames:
         return None
 
 
+# Collection of entries matching the same formatted file name pattern
 class LSSGroup:
     def __init__(self, pattern, number1=None, number2=None):
         self.pattern = pattern
@@ -47,17 +52,20 @@ class LSSGroup:
             self.count += 1
             self.numbers.append(int(number2))
 
-    def add(self, number):
+    def add(self, number) -> None:
         self.count += 1
         self.numbers.append(int(number))
 
-    def print(self):
+    # Formats and outputs entry for final lss list
+    def print(self) -> None:
         if len(self.numbers) == 0:
             print(f"1 {self.pattern}")
         else:
             print(f"{self.count} {self.pattern} {self.make_ranges()}")
 
-    def make_ranges(self):
+    # Generates file number ranges from collection of numbers
+    # Returns formatted string
+    def make_ranges(self) -> str:
         range_str = ""
         self.numbers.sort()
 
@@ -75,6 +83,7 @@ class LSSGroup:
                 range_end += 1
 
             else:
+                # break in range, wrap current range and start a new one
                 if range_start == range_end:
                     range_str += f"{range_start} "
                 else:
@@ -92,6 +101,9 @@ class LSSGroup:
         return range_str
 
 
+# Generate all possible C-style formatted file names with matching numbers
+# e.g. file4.0001.txt could be file%d.0001.txt: 4 or file4.%04d.txt: 1
+# Returns PossibleLSSFileNames object. No possible formatted file names results in empty lists for lss_names and numbers
 def generate_variations(file_name) -> PossibleLSSFileNames:
     # find number sections and replace with %ds
     matches = re.finditer(r"\d+", file_name)
@@ -117,7 +129,9 @@ def generate_variations(file_name) -> PossibleLSSFileNames:
     return PossibleLSSFileNames(original_file_name=file_name, lss_names=lss_names, numbers=numbers)
 
 
-def lss(file_path=os.path.abspath(os.getcwd())):
+# Iterates through files and folders at file_path looking for file names that can be grouped together.
+# Prints out list of format [# of files matching pattern] [pattern] [range of numbers for pattern]
+def lss(file_path=os.path.abspath(os.getcwd())) -> None:
     # get all file names
     # if isfile(join(file_path, file))
     files = [file for file in listdir(file_path)]
